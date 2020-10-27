@@ -11,6 +11,7 @@ import PIL.ImageOps
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+from net import SiameseNetwork
 
 def imshow(img,text=None,should_save=False):
     npimg = img.numpy()
@@ -101,46 +102,6 @@ concatenated = torch.cat((example_batch[0], example_batch[1]), 0)
 imshow(torchvision.utils.make_grid(concatenated))
 
 
-class SiameseNetwork(nn.Module):
-    def __init__(self):
-        super(SiameseNetwork, self).__init__()
-        self.cnn1 = nn.Sequential(
-            nn.ReflectionPad2d(1),
-            nn.Conv2d(1, 4, kernel_size=3),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(4),
-
-            nn.ReflectionPad2d(1),
-            nn.Conv2d(4, 8, kernel_size=3),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(8),
-
-            nn.ReflectionPad2d(1),
-            nn.Conv2d(8, 8, kernel_size=3),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(8)
-        )
-
-        self.fc1 = nn.Sequential(
-            nn.Linear(8*100*100, 500),
-            nn.ReLU(inplace=True),
-
-            nn.Linear(500, 500),
-            nn.ReLU(inplace=True),
-
-            nn.Linear(500, 5)
-        )
-
-    def forward_once(self, x):
-        output = self.cnn1(x)
-        output = output.view(output.size()[0], -1)
-        output = self.fc1(output)
-        return output
-
-    def forward(self, input1, input2):
-        output1 = self.forward_once(input1)
-        output2 = self.forward_once(input2)
-        return output1, output2
 
 
 class ContrastiveLoss(torch.nn.Module):
@@ -182,7 +143,7 @@ iteration_number = 0
 def cuda_maybe(device, *args):
     return [arg.to(device) for arg in args]
 
-for epoch in range(100):
+for epoch in range(10):
     for i, data in enumerate(train_dataloader):
         img0, img1, label = data
         img0, img1, label = cuda_maybe(device, img0, img1, label)
