@@ -143,7 +143,7 @@ iteration_number = 0
 def cuda_maybe(device, *args):
     return [arg.to(device) for arg in args]
 
-for epoch in range(10):
+for epoch in range(100):
     for i, data in enumerate(train_dataloader):
         img0, img1, label = data
         img0, img1, label = cuda_maybe(device, img0, img1, label)
