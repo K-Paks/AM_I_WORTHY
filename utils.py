@@ -1,6 +1,9 @@
 import cv2
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
+
+# `amiworthy.py` helpers
 
 def prep_face(file):
     face = cv2.imread(file)
@@ -34,3 +37,22 @@ class FaceCropper():
             timg = torch.from_numpy(npimg).reshape(1, 1, 100, 100)
             timg = timg.cuda()
             return timg, x, y, w, h
+
+
+# `net_train.py` helpers
+
+def imshow(img,text=None,should_save=False):
+    npimg = img.numpy()
+    plt.axis("off")
+    if text:
+        plt.text(75, 8, text, style='italic',fontweight='bold',
+            bbox={'facecolor':'white', 'alpha':0.8, 'pad':10})
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()
+
+def show_plot(iteration,loss):
+    plt.plot(iteration,loss)
+    plt.show()
+
+def cuda_maybe(device, *args):
+    return [arg.to(device) for arg in args]
