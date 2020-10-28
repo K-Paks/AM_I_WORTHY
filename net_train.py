@@ -51,43 +51,41 @@ for epoch in range(100):
 show_plot(counter, loss_history)
 
 #################
-
+# Validation
 
 from torch.autograd import Variable
 import numpy as np
 
 how_many = 60
-# max_dist = 2
-for max_dist in np.linspace(2, 3.5, 10):
-    score = 0
+max_dist = 2.7
+score = 0
 
-    folder_dataset_test = dset.ImageFolder(root=Datapath.test_dir)
-    siamese_dataset = SiameseNetworkDataset(imgFolderDS=folder_dataset_test,
-                                            transform=transforms.Compose([transforms.Resize((100, 100)),
-                                                                          transforms.ToTensor()
-                                                                          ])
-                                            , invert=False)
+folder_dataset_test = dset.ImageFolder(root=Datapath.test_dir)
+siamese_dataset = SiameseNetworkDataset(imgFolderDS=folder_dataset_test,
+                                        transform=transforms.Compose([transforms.Resize((100, 100)),
+                                                                      transforms.ToTensor()
+                                                                      ])
+                                        , invert=False)
 
-    test_dataloader = DataLoader(siamese_dataset, num_workers=0, batch_size=1, shuffle=True)
-    dataiter = iter(test_dataloader)
+test_dataloader = DataLoader(siamese_dataset, num_workers=0, batch_size=1, shuffle=True)
+dataiter = iter(test_dataloader)
 
-    for i in range(how_many):
-        x0, x1, label2 = next(dataiter)
-        concatenated = torch.cat((x0, x1), 0)
+for i in range(how_many):
+    x0, x1, label2 = next(dataiter)
+    concatenated = torch.cat((x0, x1), 0)
 
-        output1, output2 = model(Variable(x0).cuda(), Variable(x1).cuda())
-        euc_d = F.pairwise_distance(output1, output2)
+    output1, output2 = model(Variable(x0).cuda(), Variable(x1).cuda())
+    euc_d = F.pairwise_distance(output1, output2)
 
 
-        if not label2 and euc_d.item() < max_dist:
-            score+= 1
-        elif label2 and euc_d.item() > max_dist:
-            score+=1
-        # else:
-        #     imshow(torchvision.utils.make_grid(concatenated), 'Dissimilarity: {:.2f}'.format(euc_d.item()))
+    if not label2 and euc_d.item() < max_dist:
+        score+= 1
+    elif label2 and euc_d.item() > max_dist:
+        score+=1
 
-    print(f'Max_dist: {max_dist}')
-    print(score/how_many)
-    print()
+
+print(f'Max_dist: {max_dist}')
+print(score/how_many)
+print()
 
 #######

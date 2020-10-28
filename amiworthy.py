@@ -1,8 +1,6 @@
 import cv2
 import torch
-import matplotlib.pyplot as plt
 import torch.nn.functional as F
-import numpy as np
 
 from net import SiameseNetwork
 from utils import prep_face, FaceCropper
@@ -39,9 +37,9 @@ while True:
         x1, x2 = model(timg, me_day)
         euc_dist = F.pairwise_distance(x1, x2)
 
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 150, 0), 3)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 255), 3)
         if euc_dist.item() < 2.7:
-            cv2.putText(img, "Karol", (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 150, 0), 2)
+            cv2.putText(img, "Worthy", (x, y + h + 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 1)
         else:
             print(euc_dist.item())
 
