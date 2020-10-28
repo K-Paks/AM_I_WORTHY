@@ -40,7 +40,7 @@ while True:
         euc_dist = F.pairwise_distance(x1, x2)
 
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 150, 0), 3)
-        if euc_dist.item() < 2:
+        if euc_dist.item() < 2.7:
             cv2.putText(img, "Karol", (x, y + h + 20), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 150, 0), 2)
         else:
             print(euc_dist.item())
