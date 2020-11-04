@@ -39,7 +39,7 @@ while True:
 
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 255), 3)
         if euc_dist.item() < 2.7:
-            cv2.putText(img, "Worthy", (x, y + h + 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 1)
+            cv2.putText(img, "Karol", (x, y + h + 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 1)
         else:
             print(euc_dist.item())
 

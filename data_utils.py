@@ -6,7 +6,8 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 
-class Datapath():
+
+class Datapath:
     data_path = os.path.join('C:\\', 'Users', 'User', 'OneDrive', 'Programowanie', 'data', 'Faces_Oneshot')
     train_dir = os.path.join(data_path, 'faces', 'training')
     test_dir = os.path.join(data_path, 'faces', 'testing')
@@ -40,7 +41,7 @@ class SiameseNetworkDataset(Dataset):
         img0 = Image.open(img0_tuple[0])
         img1 = Image.open(img1_tuple[0])
         img0 = img0.convert('L')
-        img1 = img1.convert('L') # TODO check what it does
+        img1 = img1.convert('L')
 
         if self.invert:
             img0 = PIL.ImageOps.invert(img0)
@@ -50,7 +51,7 @@ class SiameseNetworkDataset(Dataset):
             img0 = self.transform(img0)
             img1 = self.transform(img1)
 
-        return img0, img1 , torch.from_numpy(np.array([int(img1_tuple[1]!=img0_tuple[1])], dtype=np.float32))
+        return img0, img1, torch.from_numpy(np.array([int(img1_tuple[1] != img0_tuple[1])], dtype=np.float32))
 
     def __len__(self):
         return len(self.imageFolderDS.imgs)
