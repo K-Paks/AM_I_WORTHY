@@ -1,5 +1,5 @@
 # AM_I_WORTHY
-A One-shot face recognition system built with OpenCV and PyTorch.
+A One-shot face recognition system built with OpenCV and PyTorch. Work in progress.
 
 ### Project roadmap (TODO):
 - [x] Basic Siamese Net working on [AT&T Dataset](https://www.kaggle.com/kasikrit/att-database-of-faces) 
