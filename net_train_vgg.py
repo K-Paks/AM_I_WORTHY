@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageOps
 from torchvision import models
+import time
 
 from net import ContrastiveLoss
 
@@ -65,7 +66,7 @@ vgg_siamese_dataset = SiameseNetworkDatasetVGG(
 
 train_dataloader = DataLoader(
     dataset=vgg_siamese_dataset,
-    batch_size=4,
+    batch_size=16,
     shuffle=False,
     num_workers=0
 )
@@ -83,9 +84,9 @@ def imshow(inp, title=None):
     plt.pause(0.001)  # pause a bit so that plots are updated
 
 
-# inp1, inp2, classes = next(iter(train_dataloader))
-# out = torchvision.utils.make_grid(torch.cat((inp1, inp2), dim=2))
-# imshow(out, title=[int(x.item()) for x in classes])
+inp1, inp2, labels = next(iter(train_dataloader))
+out = torchvision.utils.make_grid(torch.cat((inp1, inp2), dim=2))
+imshow(out, title=[int(x.item()) for x in labels])
 
 model_ft = models.resnet18(pretrained=True).to(device)
 num_features = model_ft.fc.in_features
@@ -107,6 +108,7 @@ epoch_loss_hist = []
 data_len = len(train_dataloader)
 
 for epoch in range(num_epochs):
+    since = time.time()
     print(f'Epoch {epoch}/{num_epochs - 1}')
     print('-' * 10)
 
@@ -116,7 +118,7 @@ for epoch in range(num_epochs):
     # running_corrects = 0
 
     for i, (inp1, inp2, labels) in enumerate(train_dataloader):
-        if i%500 == 0:
+        if i % 32 == 0 and i != 0:
             print(f'{i} out of {data_len}')
 
         inp1, inp2, labels = to_device(device, inp1, inp2, labels)
@@ -135,12 +137,43 @@ for epoch in range(num_epochs):
     epoch_loss_hist.append(epoch_loss)
     print('{} Loss: {:.4f}'.format(
         "train", epoch_loss))
+    time_elapsed = time.time() - since
 
+# validation
+vgg_test_data = os.path.join('D:\\', 'bigdata', 'vggface2_test', 'small_test_data')
+folder_dataset = dset.ImageFolder(root=vgg_test_data)
 
+vgg_test_siamese_dataset = SiameseNetworkDatasetVGG(
+    folder=folder_dataset,
+    transform=transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ]),
+    invert=False
+)
 
+test_dataloader = DataLoader(
+    dataset=vgg_test_siamese_dataset,
+    batch_size=16,
+    shuffle=False,
+    num_workers=0
+)
 
+final_acc = 0
+for i, (inp1, inp2, labels) in enumerate(test_dataloader):
+    inp1, inp2, labels = to_device(device, inp1, inp2, labels)
 
+    out1 = model_ft(inp1)
+    out2 = model_ft(inp2)
 
+    dist = F.pairwise_distance(out1, out2, keepdim=True)
+    np_labels = labels.cpu().detach().numpy()
+    np_dist = dist.cpu().detach().numpy() > 1
+
+    final_acc += sum(np.logical_and(np_labels, np_dist))
+
+final_acc_percentage = final_acc.item() / len(test_dataloader)
 
 
 
