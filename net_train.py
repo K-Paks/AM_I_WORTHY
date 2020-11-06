@@ -16,7 +16,7 @@ siamese_dataset = SiameseNetworkDataset(imgFolderDS=folder_dataset,
                                             transforms.Resize((100, 100)),
                                             transforms.ToTensor(),
                                         ]),
-                                        invert=True)
+                                        invert=False)
 model = SiameseNetwork().to(device)
 criterion = ContrastiveLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
@@ -24,7 +24,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
 train_dataloader = DataLoader(siamese_dataset,
                               shuffle=True,
                               num_workers=0,
-                              batch_size=64)
+                              batch_size=4)
 
 # training
 counter = []
